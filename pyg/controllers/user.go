@@ -11,7 +11,7 @@ import (
 
 	"fmt"
 	"github.com/astaxie/beego/orm"
-	"pyg/pyg/models"
+	"pygGitHub/pyg/models"
 	"strings"
 	"github.com/astaxie/beego/utils"
 	"encoding/base64"
@@ -66,7 +66,8 @@ func (this *UserController) HandleSendMsg() {
 	}
 	rand.Seed(time.Now().UnixNano())
 
-	vcode := fmt.Sprintf("%06d", rand.Intn(1000000))
+	vcode := fmt.Sprintf("%d", (rand.Intn(9)+1)*100000+(rand.Intn(9)+1)*10000+(rand.Intn(9)+1)*1000+(rand.Intn(9)+1)*100+
+		(rand.Intn(9)+1)*10+(rand.Intn(9)+1))
 
 	//发送短信   SDK调用
 	client, err := sdk.NewClientWithAccessKey("default", "LTAI3yPOlEWwd1FS", "iH61UaC4fwVCex0tqYLq17hB3S7GbF")
@@ -94,7 +95,7 @@ func (this *UserController) HandleSendMsg() {
 		beego.Error(err)
 		//2.给容器赋值
 		resp["errno"] = 4
-		resp["errmsg"] = "短信发送失败"
+		resp["errmsg"] = err
 		return
 	}
 
@@ -198,7 +199,7 @@ func (this *UserController) HandleEmail() {
 	user.Email = email
 	o.Update(&user, "Email")
 
-	this.Ctx.WriteString("邮件已发送，点击激活")
+	this.Redirect("/login",302)
 }
 
 //激活

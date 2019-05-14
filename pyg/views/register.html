@@ -121,9 +121,10 @@
 				param={"phone":phone}
 				$.post("/sendMsg",param,function (data) {
                     if (data.errno !=5){
-                        vcode=data.code
+
                         alert(data.errmsg)
                     }else{
+                        vcode=data.code
                         alert("数据传输成功")
                     }
                 })

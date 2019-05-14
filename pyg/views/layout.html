@@ -1,4 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -43,7 +44,7 @@
     <div class="left_menu_con clearfix">
         <h3>用户中心</h3>
         <ul>
-            {{if compare .yellowpoint 1}}
+        {{/*{{if compare .yellowpoint 1}}
                 <li><a href="/user/usercenterinfo" class="active">· 个人信息</a></li>
                 <li><a href="/user/order">· 全部订单</a></li>
                 <li><a href="/user/site" >· 收货地址</a></li>
@@ -55,11 +56,15 @@
                 <li><a href="/user/usercenterinfo">· 个人信息</a></li>
                 <li><a href="/user/order">· 全部订单</a></li>
                 <li><a href="/user/site" class="active">· 收货地址</a></li>
-        {{end}}
+        {{end}}*/}}
+            <li><a href="/user/usercenterinfo">· 个人信息</a></li>
+            <li><a href="/user/order">· 全部订单</a></li>
+            <li><a href="/user/site">· 收货地址</a></li>
         </ul>
     </div>
 
 {{.LayoutContent}}
+</div>
 
 <div class="py-container copyright footer">
     <ul>
@@ -76,6 +81,18 @@
     <div class="beian">京ICP备08001421号京公网安备110108007702
     </div>
 </div>
-
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+       var local= window.location.pathname;
+       $('div.left_menu_con.clearfix ul li').each(function () {
+           var hrefs = $(this).find('a').attr('href');
+           if(local == hrefs){
+               $(this).find('a').attr('class','active');
+               return false;
+           }
+       });
+    });
+</script>
 </body>
 </html>

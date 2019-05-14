@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"pyg/pyg/controllers"
+	"pygGitHub/pyg/controllers"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 )
