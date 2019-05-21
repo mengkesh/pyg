@@ -15,6 +15,7 @@ import (
 	"strings"
 	"github.com/astaxie/beego/utils"
 	"encoding/base64"
+	"math"
 )
 
 type Message struct {
@@ -33,7 +34,7 @@ func (this *UserController) ShowRegister() {
 }
 
 //封装一个返回json的函数
-func RespFunc(this *UserController, resp map[string]interface{}) {
+func RespFunc(this *beego.Controller, resp map[string]interface{}) {
 	//3.把容器传给前端
 	this.Data["json"] = resp
 	//4.指定传递方式
@@ -45,7 +46,7 @@ func (this *UserController) HandleSendMsg() {
 	phone := this.GetString("phone")
 	//1.定义一个传递给ajax json数据的容器
 	resp := make(map[string]interface{})
-	defer RespFunc(this, resp)
+	defer RespFunc(&this.Controller, resp)
 	//检查手机号是否空
 	if phone == "" {
 		beego.Error("获取电话号码失败")
@@ -230,7 +231,6 @@ func (this *UserController) ShowLogin() {
 		this.Data["nsername"] = ""
 		this.Data["check"] = ""
 	}
-
 	this.TplName = "login.html"
 }
 
@@ -357,8 +357,42 @@ func (this *UserController) ShowUserCenterInfo() {
 //展示用户中心订单页
 func (this *UserController) ShowOrder() {
 	username:=this.GetSession("userName").(string)
+	singlepagenum:=2
+	o:=orm.NewOrm()
+	count,_:=o.QueryTable("OrderInfo").RelatedSel("User").Filter("User__Name",username).Count()
+	pagenums:=int(math.Ceil(float64(count)/float64(singlepagenum)))
+	pageindex,err:=this.GetInt("pageindex")
+	if err!=nil{
+		pageindex=1
+	}
+	prepage:=pageindex-1
+	if prepage<=1 {
+		prepage=1
+	}
+	nextpage:=pageindex+1
+	if nextpage>= pagenums{
+		nextpage=pagenums
+	}
+
+	pages := Countpages(pagenums, pageindex)
+	var orderinfos []models.OrderInfo
+	o.QueryTable("OrderInfo").RelatedSel("User").Filter("User__Name",username).OrderBy("-Time").Limit(singlepagenum,singlepagenum*(pageindex-1)).All(&orderinfos)
+	var orderinfolist []map[string]interface{}
+	for _,v:=range orderinfos{
+		oderinfocontent:=make(map[string]interface{})
+		oderinfocontent["orderinfo"]=v
+		var ordergoods []models.OrderGoods
+		o.QueryTable("OrderGoods").RelatedSel("GoodsSku","OrderInfo").Filter("OrderInfo",v).All(&ordergoods)
+		oderinfocontent["ordergoods"]=ordergoods
+		orderinfolist=append(orderinfolist,oderinfocontent)
+	}
+	this.Data["pageindex"]=pageindex
+	this.Data["prepage"]=prepage
+	this.Data["nextpage"]=nextpage
+	this.Data["pages"]=pages
+	this.Data["orderinfolist"]=orderinfolist
+	//this.Data["yellowpoint"]=2
 	this.Data["username"]=username
-	this.Data["yellowpoint"]=2
 	this.Layout = "layout.html"
 	this.TplName = "user_center_order.html"
 }
@@ -378,12 +412,10 @@ func (this *UserController) ShowSite() {
 		this.Data["address"] = nil
 	} else {
 		this.Data["address"] = address
-		phonebytes := []byte(address.Phone)
-		phonebytes[3] = '*'
-		phonebytes[4] = '*'
-		phonebytes[5] = '*'
-		phonebytes[6] = '*'
-		this.Data["phone"] = string(phonebytes)
+		qian :=address.Phone[:3]
+		hou := address.Phone[7:]
+		phonehandle:= qian + "****" + hou
+		this.Data["phone"] = phonehandle
 	}
 	this.Data["username"]=name
 	this.Layout = "layout.html"
