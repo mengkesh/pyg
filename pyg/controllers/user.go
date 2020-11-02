@@ -71,7 +71,7 @@ func (this *UserController) HandleSendMsg() {
 		(rand.Intn(9)+1)*10+(rand.Intn(9)+1))
 
 	//发送短信   SDK调用
-	client, err := sdk.NewClientWithAccessKey("default", "LTAI3yPOlEWwd1FS", "iH61UaC4fwVCex0tqYLq17hB3S7GbF")
+	client, err := sdk.NewClientWithAccessKey("default", "LTAI3yPO********", "iH61UaC4fwVCex0tqYLq**********")
 	if err != nil {
 		beego.Error(err)
 		//2.给容器赋值
